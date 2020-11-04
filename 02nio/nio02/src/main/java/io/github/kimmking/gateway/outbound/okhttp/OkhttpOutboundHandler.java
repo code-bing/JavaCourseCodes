@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpUtil;
+import okhttp3.Call;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -30,10 +31,10 @@ public class OkhttpOutboundHandler {
 
     public OkhttpOutboundHandler(String proxyServer) {
         this.proxyServer = proxyServer;
-        client = new OkHttpClient.Builder()
-                .readTimeout(100, TimeUnit.MILLISECONDS)
-                .connectTimeout(50, TimeUnit.MILLISECONDS)
-                .build();
+//        client = new OkHttpClient.Builder()
+//                .readTimeout(100, TimeUnit.MILLISECONDS)
+//                .connectTimeout(50, TimeUnit.MILLISECONDS)
+//                .build();
         RejectedExecutionHandler policy = new ThreadPoolExecutor.CallerRunsPolicy();
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
@@ -52,33 +53,36 @@ public class OkhttpOutboundHandler {
                 .build();
         Request request = new Request.Builder().get().url(url).build();
         Response response = null;
+        Call call = client.newCall(request);
         try {
-            response = client.newCall(request).execute();
+            response = call.execute();
             handleResponse(ctx, response, fullRequest);
         } catch (IOException e) {
             e.printStackTrace();
+            call.cancel();
         }
     }
 
     private void handleResponse(ChannelHandlerContext ctx, Response response, FullHttpRequest fullRequest) throws IOException {
         DefaultFullHttpResponse httpResponse = null;
-        try {
-            String body = response.body().string();
-            httpResponse = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body.getBytes()));
-            httpResponse.headers().set("Content-Type", "application/json");
-            httpResponse.headers().setInt("Content-Length", httpResponse.content().readableBytes());
-        } catch (Exception e) {
-            e.printStackTrace();
-            httpResponse = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
-        } finally {
-            if (!HttpUtil.isKeepAlive(fullRequest)) {
-                ctx.write(httpResponse).addListener(ChannelFutureListener.CLOSE);
-            } else {
-                ctx.write(httpResponse);
+        if(response.isSuccessful()){
+            try {
+                String body = response.body().string();
+                httpResponse = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body.getBytes()));
+                httpResponse.headers().set("Content-Type", "application/json");
+                httpResponse.headers().setInt("Content-Length", httpResponse.content().readableBytes());
+            } catch (Exception e) {
+                e.printStackTrace();
+                httpResponse = new DefaultFullHttpResponse(HTTP_1_1, NO_CONTENT);
+            } finally {
+                if (!HttpUtil.isKeepAlive(fullRequest)) {
+                    ctx.write(httpResponse).addListener(ChannelFutureListener.CLOSE);
+                } else {
+                    ctx.write(httpResponse);
+                }
+                ctx.flush();
             }
-            ctx.flush();
         }
-
     }
 
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
