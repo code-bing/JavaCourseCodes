@@ -4,36 +4,16 @@ import org.junit.Test;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.LockSupport;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 本周作业：（必做）思考有多少种方式，在main函数启动一个新线程或线程池，
  * 异步运行一个方法，拿到这个方法的返回值后，退出主线程？
  * 写出你的方法，越多越好，提交到github。
- * <p>
- * 一个简单的代码参考：
  */
 public class Homework03 {
-
-    public static void main(String[] args) {
-
-        long start = System.currentTimeMillis();
-        // 在这里创建一个线程或线程池，
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-            }
-        }).start();
-        // 异步执行 下面方法
-        int result = sum(); //这是得到的返回值
-
-        // 确保  拿到result 并输出
-        System.out.println("异步计算结果为：" + result);
-
-        System.out.println("使用时间：" + (System.currentTimeMillis() - start) + " ms");
-
-        // 然后退出main线程
-
-    }
 
     /**
      * 使用join,子线程通过join确保执行
@@ -152,16 +132,87 @@ public class Homework03 {
             barrier.await();
         } catch (InterruptedException | BrokenBarrierException e) {
             e.printStackTrace();
-        } finally {
         }
         System.out.println("异步计算结果为：" + atomicInteger.get());
 
     }
 
-    //CyclicBarrier
+    //LockSupport 阻塞1s
     @Test
     public void test07() {
+        AtomicInteger atomicInteger = new AtomicInteger();
+        Thread thread = new Thread(() -> {
+            atomicInteger.set(sum());
+        });
+        thread.start();
+        LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(1000));
+        System.out.println("异步计算结果为：" + atomicInteger.get());
+    }
 
+    //Condition 的等待通知方法
+    @Test
+    public void test08() {
+        AtomicInteger atomicInteger = new AtomicInteger();
+        ReentrantLock lock = new ReentrantLock();
+        Condition condition = lock.newCondition();
+        Thread thread = new Thread(() -> {
+            lock.lock();
+            atomicInteger.set(sum());
+            try {
+                condition.signal();
+            } finally {
+                lock.unlock();
+            }
+        });
+        thread.start();
+        lock.lock();
+        try {
+            condition.await();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("异步计算结果为：" + atomicInteger.get());
+        lock.unlock();
+    }
+
+    //线程池+Future ,阻塞等待返回
+    @Test
+    public void test09() {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Future<Integer> future = executorService.submit(new Callable<Integer>() {
+            @Override
+            public Integer call() throws Exception {
+                return sum();
+            }
+        });
+        try {
+            System.out.println("异步计算结果为：" + future.get());
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+        executorService.shutdown();
+    }
+
+
+    //semaphore 阻塞主线程，等待子线程执行完成释放
+    @Test
+    public void test10() {
+        Semaphore semaphore = new Semaphore(0);
+        AtomicInteger integer = new AtomicInteger();
+        new Thread(() -> {
+            integer.set(sum());
+            // 子线程执行完成，释放
+            semaphore.release();
+        }).start();
+        try {
+            // 信号量为0，阻塞
+            semaphore.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("异步计算结果为：" + integer.get());
     }
 
     private static int sum() {

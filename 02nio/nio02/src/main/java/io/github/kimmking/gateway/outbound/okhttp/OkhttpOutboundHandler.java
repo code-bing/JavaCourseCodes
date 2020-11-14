@@ -31,10 +31,6 @@ public class OkhttpOutboundHandler {
 
     public OkhttpOutboundHandler(String proxyServer) {
         this.proxyServer = proxyServer;
-//        client = new OkHttpClient.Builder()
-//                .readTimeout(100, TimeUnit.MILLISECONDS)
-//                .connectTimeout(50, TimeUnit.MILLISECONDS)
-//                .build();
         RejectedExecutionHandler policy = new ThreadPoolExecutor.CallerRunsPolicy();
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
@@ -49,6 +45,7 @@ public class OkhttpOutboundHandler {
     }
 
     private void execute(ChannelHandlerContext ctx, String url, FullHttpRequest fullRequest) {
+//        创建OkHttpClient
         client = new OkHttpClient.Builder()
                 .build();
         Request request = new Request.Builder().get().url(url).build();
@@ -68,6 +65,7 @@ public class OkhttpOutboundHandler {
         if(response.isSuccessful()){
             try {
                 String body = response.body().string();
+//                设置响应头
                 httpResponse = new DefaultFullHttpResponse(HTTP_1_1, OK, Unpooled.wrappedBuffer(body.getBytes()));
                 httpResponse.headers().set("Content-Type", "application/json");
                 httpResponse.headers().setInt("Content-Length", httpResponse.content().readableBytes());
@@ -81,14 +79,8 @@ public class OkhttpOutboundHandler {
                     ctx.write(httpResponse);
                 }
                 ctx.flush();
+                ctx.close();
             }
         }
     }
-
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
-
 }
