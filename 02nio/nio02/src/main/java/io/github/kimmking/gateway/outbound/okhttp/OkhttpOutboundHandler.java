@@ -35,7 +35,7 @@ public class OkhttpOutboundHandler {
 //                .readTimeout(100, TimeUnit.MILLISECONDS)
 //                .connectTimeout(50, TimeUnit.MILLISECONDS)
 //                .build();
-        RejectedExecutionHandler policy = new ThreadPoolExecutor.CallerRunsPolicy();
+        RejectedExecutionHandler policy = new ThreadPoolExecutor.AbortPolicy();
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
         int queueSize = 2048;
@@ -81,14 +81,8 @@ public class OkhttpOutboundHandler {
                     ctx.write(httpResponse);
                 }
                 ctx.flush();
+                ctx.close();
             }
         }
     }
-
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        cause.printStackTrace();
-        ctx.close();
-    }
-
-
 }
