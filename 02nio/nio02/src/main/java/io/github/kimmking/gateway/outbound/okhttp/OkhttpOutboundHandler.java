@@ -31,7 +31,7 @@ public class OkhttpOutboundHandler {
 
     public OkhttpOutboundHandler(String proxyServer) {
         this.proxyServer = proxyServer;
-        RejectedExecutionHandler policy = new ThreadPoolExecutor.CallerRunsPolicy();
+        RejectedExecutionHandler policy = new ThreadPoolExecutor.AbortPolicy();
         int cores = Runtime.getRuntime().availableProcessors() * 2;
         long keepAliveTime = 1000;
         int queueSize = 2048;
