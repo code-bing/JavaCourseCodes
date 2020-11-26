@@ -12,11 +12,11 @@ import java.util.Map;
 public class DependencyLookupDemo {
     public static void main(String[] args) {
         BeanFactory context = new ClassPathXmlApplicationContext("classpath:applicationContext.xml");
-//        lookupInRealTime(context);
+        lookupInRealTime(context);
 //        lookupInLazy(context);
 //        lookupByType(context);
 //        lookupCollectionByType(context);
-        lookupByAnnotation(context);
+//        lookupByAnnotation(context);
     }
 
     private static void lookupByAnnotation(BeanFactory context) {
