@@ -15,7 +15,7 @@ public class OrderController {
     private OrderService orderService;
 
     @GetMapping("/order/query")
-    public List<Order> gerOrderList() {
+    public List<Order> getOrderList() {
         return orderService.queryOrder();
     }
 }
