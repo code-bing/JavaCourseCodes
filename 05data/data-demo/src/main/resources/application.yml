@@ -1,0 +1,33 @@
+spring:
+  shardingsphere:
+    props:
+      sql:
+        show: true
+    masterslave:
+      name:
+      master-data-source-name:
+      slave-data-source-names:
+      load-balance-algorithm-type: random
+    datasource:
+      names: master,slave0,slave1
+      master:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/ds_master
+        username: root
+        password:
+        type: org.apache.commons.dbcp.BasicDataSource
+
+      slave1:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3316/ds_master
+        username: root
+        password:
+        type: org.apache.commons.dbcp.BasicDataSource
+
+      slave2:
+        driverClassName: com.mysql.jdbc.Driver
+        url: jdbc:mysql://localhost:3306/ds_master
+        username: root
+        password:
+        type: org.apache.commons.dbcp.BasicDataSource
+
