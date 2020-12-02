@@ -1,25 +1,33 @@
 spring:
   shardingsphere:
     datasource:
-      names: master,slave1
+      common:
+        type: com.zaxxer.hikari.HikariDataSource
+        driver-class-name: com.mysql.jdbc.Driver
+        username: root
+      names: master,slave1,slave2
       master:
-        driver-class-name: com.mysql.jdbc.Driver
-        type: com.zaxxer.hikari.HikariDataSource
-        jdbcUrl: jdbc:mysql://localhost:3311/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-        username: root
+        jdbcUrl: jdbc:mysql://localhost:3306/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
       slave1:
-        driver-class-name: com.mysql.jdbc.Driver
-        type: com.zaxxer.hikari.HikariDataSource
         jdbcUrl: jdbc:mysql://localhost:3316/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
-        username: root
-    masterslave:
-      master-data-source-name: master
-      slave-data-source-names: slave1
-      load-balance-algorithm-type: random
+      slave2:
+        jdbcUrl: jdbc:mysql://localhost:3317/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     props:
       sql:
         show: true
     enabled: true
+    rules:
+      replica-query:
+        load-balancers:
+         round-robin:
+          type: ROUND_ROBIN
+          props:
+            workid: 123
+        datasources:
+          ps_ds:
+            primary-data-source-name: master
+            replica-data-source-names: slave1,slave2
+            load-balancer-name: round_robin
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm:ss
@@ -31,7 +39,7 @@ mybatis:
   type-aliases-package: com.github.yibing.data.datademo2.entity
   mapper-locations: classpath:dao/*.xml
 server:
-  port: 8088
+  port: 8086
 logging:
   level:
     com.github.yibing.data.datademo2: debug

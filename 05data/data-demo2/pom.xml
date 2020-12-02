@@ -41,18 +41,23 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-        <!-- for spring boot -->
-        <dependency>
-            <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>
-            <version>${sharding-sphere.version}</version>
-        </dependency>
+        <!--        &lt;!&ndash; for spring boot &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.shardingsphere</groupId>-->
+        <!--            <artifactId>sharding-jdbc-spring-boot-starter</artifactId>-->
+        <!--            <version>${sharding-sphere.version}</version>-->
+        <!--        </dependency>-->
 
-        <!-- for spring namespace -->
+        <!--        &lt;!&ndash; for spring namespace &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.apache.shardingsphere</groupId>-->
+        <!--            <artifactId>sharding-jdbc-spring-namespace</artifactId>-->
+        <!--            <version>${sharding-sphere.version}</version>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.apache.shardingsphere</groupId>
-            <artifactId>sharding-jdbc-spring-namespace</artifactId>
-            <version>${sharding-sphere.version}</version>
+            <artifactId>shardingsphere-jdbc-core-spring-boot-starter</artifactId>
+            <version>5.0.0-alpha</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

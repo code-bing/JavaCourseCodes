@@ -96,7 +96,7 @@ public class JdbcDemo {
     @Test
     public void batchInsert() {
         ArrayList<Student> list = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100000; i++) {
             list.add(new Student("student" + i));
         }
         // 使用 JDBC
@@ -109,11 +109,7 @@ public class JdbcDemo {
             psmt = connection.prepareStatement(sql);
             connection.setAutoCommit(false);
             for (int i = 0; i < list.size(); i++) {
-                if (i == 5) {
-                    psmt.setString(1, "sssssssssssssssssssssssssssssssssssssssssssssssssssssss");
-                } else {
-                    psmt.setString(1, list.get(i).getName());
-                }
+                psmt.setString(1, list.get(i).getName());
                 psmt.executeUpdate();
             }
             connection.commit();
