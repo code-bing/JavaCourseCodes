@@ -1,0 +1,13 @@
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.yibing.data.datademo2.dao.ProductMapper">
+
+    <select id="listProducts" resultType="com.github.yibing.data.datademo2.entity.Product">
+        select * from product
+    </select>
+
+    <insert id="insert" parameterType="com.github.yibing.data.datademo2.entity.Product">
+        insert into product(product_id,price,product_name,create_time,update_time,description,product_type,status)
+        values(#{productId},#{price},#{productName},#{createTime},#{updateTime},#{description},#{productType},#{status})
+    </insert>
+
+</mapper>

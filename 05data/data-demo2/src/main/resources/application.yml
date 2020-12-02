@@ -1,0 +1,38 @@
+spring:
+  shardingsphere:
+    datasource:
+      names: master,slave1
+      master:
+        driver-class-name: com.mysql.jdbc.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+        jdbcUrl: jdbc:mysql://localhost:3311/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+        username: root
+      slave1:
+        driver-class-name: com.mysql.jdbc.Driver
+        type: com.zaxxer.hikari.HikariDataSource
+        jdbcUrl: jdbc:mysql://localhost:3316/mall?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+        username: root
+    masterslave:
+      master-data-source-name: master
+      slave-data-source-names: slave1
+      load-balance-algorithm-type: random
+    props:
+      sql:
+        show: true
+    enabled: true
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm:ss
+
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  type-aliases-package: com.github.yibing.data.datademo2.entity
+  mapper-locations: classpath:dao/*.xml
+server:
+  port: 8088
+logging:
+  level:
+    com.github.yibing.data.datademo2: debug
+
