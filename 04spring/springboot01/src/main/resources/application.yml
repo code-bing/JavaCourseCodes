@@ -1,0 +1,7 @@
+spring:
+  rabbitmq:
+    host: localhost
+    password: guest
+    username: guest
+    virtual-host: testHost
+    port: 5672
