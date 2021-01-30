@@ -95,7 +95,7 @@ public class JdbcDemo {
     // 批量插入
     @Test
     public void batchInsert() {
-        ArrayList<Student> list = new ArrayList<>();
+        ArrayList<Student> list = new ArrayList<Student>();
         for (int i = 0; i < 100000; i++) {
             list.add(new Student("student" + i));
         }
