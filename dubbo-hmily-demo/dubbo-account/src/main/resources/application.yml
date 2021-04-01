@@ -1,0 +1,25 @@
+server:
+  port: 7001
+spring:
+  datasource:
+    driver-class-name: com.mysql.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3311/account_a?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8&useSSL=false
+    username: root
+    password: root
+
+dubbo:
+  application:
+    name: dubbo-provider
+  scan:
+    base-packages: io.dobson.account
+  registry:
+    address: zookeeper://localhost:2181
+  protocol:
+    name: dubbo
+    port: 12345
+  metadata-report:
+    address: zookeeper://localhost:2181
+
+mybatis:
+  type-aliases-package: io.dobson.account.entity
+  mapper-locations: classpath:mapper/*.xml
